@@ -1,60 +1,89 @@
-Tutorial - Compile Linux wallet on Ubuntu Server 22.04
-Compile a wallet for Ubuntu Linux on Ubuntu Server 22.04 with the following tutorial.
+Tutorial - Mine for blocks with macOS
+Mine for blocks with your macOS wallet and the following instructions.
 
-Update your Ubuntu server with the following command:
+Open Spotlight Search and type the following:
 
-sudo apt-get update && sudo apt-get upgrade -y
+terminal
 
-Install the required dependencies with the following command:
+Double click on terminal.
 
-sudo apt-get install make automake cmake curl g++-multilib libtool binutils-gold bsdmainutils pkg-config python3 patch bison -y
+Execute the following command, to open your downloads directory:
 
-Create your source code directory with the following commands:
+cd Downloads
 
-cd ~/
-mkdir source_code
-cd source_code
+Install Homebrew with the following command:
 
-Download the source code of your coin with the following command:
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
 
-wget "https://dl.walletbuilders.com/download?customer=b99a53a3f81f1bbb2049773ab7e188c73b503cc19256b64eb5&filename=kingpepe-source.tar.gz" -O kingpepe-source.tar.gz
+Enter your sudo password to install Homebrew.
 
-Type the following command to extract the tar file:
+Install wget with the following command:
 
-tar -xzvf kingpepe-source.tar.gz
+brew install wget
 
-64-bit
+Download your macOS wallet with the following command:
 
-Build x86_64-pc-linux-gnu with the following commands:
+wget "https://dl.walletbuilders.com/download?customer=7fd7ad0365703844c530ed1b76f8838f9e81a832a1178f1a56&filename=kingpepe-qt.dmg" -O kingpepe-qt.dmg
 
-PATH=$(echo "$PATH" | sed -e 's/:\/mnt.*//g')
-cd depends
-make HOST=x86_64-pc-linux-gnu
-cd ..
+Download the macOS tools for your wallet with the following command:
 
-Type the following commands to compile your wallet for Ubuntu Linux.
+wget "https://dl.walletbuilders.com/download?customer=7fd7ad0365703844c530ed1b76f8838f9e81a832a1178f1a56&filename=kingpepe-tools-macos.tar.gz" -O kingpepe-tools-macos.tar.gz
 
-./autogen.sh
-CONFIG_SITE=$PWD/depends/x86_64-pc-linux-gnu/share/config.site ./configure --prefix=/
-make
+Extract the tar file with the following command:
 
-Type the following command to clean your source code:
+tar -xzvf kingpepe-tools-macos.tar.gz
 
-make clean
+Create the data directory for your coin with the following command:
 
-32-bit
+mkdir "$HOME/Library/Application Support/Kingpepe/"
 
-Build i686-pc-linux-gnu with the following commands:
+Open nano.
 
-PATH=$(echo "$PATH" | sed -e 's/:\/mnt.*//g')
-cd depends
-make HOST=i686-pc-linux-gnu
-cd ..
+nano "$HOME/Library/Application Support/Kingpepe/kingpepe.conf" -t
 
-Type the following commands to compile your wallet for Ubuntu Linux.
+Paste the following into nano.
 
-./autogen.sh
-CONFIG_SITE=$PWD/depends/i686-pc-linux-gnu/share/config.site ./configure --prefix=/
-make
+rpcuser=rpc_kingpepe
+rpcpassword=dR2oBQ3K1zYMZQtJFZeAerhWxaJ5Lqeq9J2
+rpcbind=127.0.0.1
+rpcallowip=127.0.0.1
+listen=1
+server=1
+addnode=node3.walletbuilders.com
 
-The compiled wallet for Ubuntu Linux is located in the directory src/qt, the tools are located in the directory src.
+Save the file with the keyboard shortcut ctrl + x.
+
+Open nano.
+
+nano mine.sh -t
+
+Paste the following into nano.
+
+#!/bin/bash
+SCRIPT_PATH=`pwd`;
+cd $SCRIPT_PATH
+echo Press [CTRL+C] to stop mining.
+while :
+do
+./kingpepe-cli generatetoaddress 1 $(./kingpepe-cli getnewaddress)
+done
+
+Save the file with the keyboard shortcut ctrl + x.
+
+Make the file executable.
+
+chmod +x mine.sh
+
+Open your downloads directory in Finder.
+
+Install your macOS wallet with the file kingpepe-qt.dmg.
+
+Open your wallet.
+
+Go back to the terminal and type the following command to create the wallet file for your desktop wallet:
+
+./kingpepe-cli createwallet ""
+
+Execute the following command in terminal to mine your first block:
+
+./mine.sh
